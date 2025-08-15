@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SWIFT OPS Workflow Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    .mermaid {
+      padding: 20px;
+      background: white;
+      border: 1px solid #ddd;
+      margin: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h2 style="padding-left:20px;">SWIFT OPS Workflow</h2>
+  <div class="mermaid">
+flowchart TD
+  %% Inbaskets
+  IR[Inward_remittance]:::inb
+  F50[SWF_F50]:::inb
+  TXN[SWF-TXN-Screening]:::inb
+  CNG[CNG Workbasket]:::inb
+  RM[ReturnedMessage]:::inb
+
+  %% Terminals / Queues
+  RESOLVED([Case Resolved]):::term
+  PEND[Pending Swift sender checker]:::q
+  SWF50Q[SWF-50 Workbasket]:::q
+  TXNSQ[TxnScreening workbasket]:::q
+  SUPP[Suppressed workbasket]:::q
+  EMAIL[[Send Email: no-department-match]]:::side
+
+  %% 1) Inward_remittance / SWF_F50
+  IR -- "Return To SwiftOps" --> RM
+  F50 -- "Return To SwiftOps" --> RM
+  IR -- "Completed" --> RESOLVED
+  F50 -- "Completed" --> RESOLVED
+
+  %% 2) SWF-TXN-Screening / CNG Workbasket
+  TXN -- "Return To SwiftOps" --> RM
+  CNG -- "Return To SwiftOps" --> RM
+
+  TXN -- "Completed" --> D1{hasReplyMessage?}
+  CNG -- "Completed" --> D1
+  D1 -- "Yes" --> PEND
+  D1 -- "No" --> D1b{Department?}
+  D1b -- "SWF-50" --> SWF50Q
+  D1b -- "SWF-TXN-Screening" --> TXNSQ
+  D1b -- "Other" --> EMAIL
+
+  %% 3) ReturnedMessage branch
+  RM -- "suppress" --> SUPP
+  RM -- "completed" --> D2{hasResponseMessage?}
+  D2 -- "Yes" --> PEND
+  D2 -- "No" --> D2b{Department?}
+  D2b -- "SWF-50" --> SWF50Q
+  D2b -- "SWF-TXN-Screening" --> TXNSQ
+  D2b -- "Other" --> EMAIL
+
+  %% Styles
+  classDef inb fill:#eef7ff,stroke:#4a90e2,stroke-width:1px;
+  classDef q fill:#f6fff0,stroke:#57a957,stroke-width:1px;
+  classDef term fill:#fffbe6,stroke:#b28b00,stroke-width:1px;
+  classDef side fill:#fff3f3,stroke:#d9534f,stroke-width:1px;
+  </div>
+</body>
+</html>
+
