@@ -1,41 +1,33 @@
-/* General table style */
+/* Generic table for SWIFT messages */
 .swift-table {
   width: 100%;
-  border-collapse: collapse;   /* remove spacing between cells */
+  border-collapse: collapse;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
   color: #333333;
   margin: 0 auto;
-  table-layout: fixed; /* keeps columns aligned in PDF */
-  word-wrap: break-word; /* wrap long SWIFT fields */
+  table-layout: fixed; /* keeps layout stable */
+  word-wrap: break-word;
 }
 
-/* Table header */
-.swift-table thead th {
-  background-color: #f2f2f2;
-  color: #000000;
-  font-weight: bold;
-  text-align: left;
-  padding: 6px 8px;
+/* Row cells */
+.swift-table td {
   border: 1px solid #999999;
-}
-
-/* Table body */
-.swift-table tbody td {
   padding: 6px 8px;
-  border: 1px solid #999999;
   vertical-align: top;
 }
 
-/* Alternate row shading */
-.swift-table tbody tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-/* Optional: section header rows */
-.swift-table .section-header td {
-  background-color: #d9edf7;
+/* Left cell = header (label) */
+.swift-table td.header {
+  width: 30%;
+  background-color: #f2f2f2;
   font-weight: bold;
   text-align: left;
-  border: 1px solid #999999;
 }
+
+/* Right cell = value */
+.swift-table td.value span {
+  display: block;
+  white-space: pre-wrap; /* preserve line breaks in SWIFT messages */
+}
+
